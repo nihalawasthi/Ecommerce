@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login with Google</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 100px;
+        }
+        #login-button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Login with Google</h2>
+
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID"
+         data-callback="handleCredentialResponse">
+    </div>
+
+    <div class="g_id_signin" 
+         data-type="standard"
+         data-shape="rectangular"
+         data-theme="outline"
+         data-text="signin_with"
+         data-size="large"
+         data-logo_alignment="left">
+    </div>
+
+    <script>
+        function handleCredentialResponse(response) {
+            fetch('http://localhost:8000/api/users/google-login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ token: response.credential })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.access) {
+                    alert("Login Successful!");
+                    console.log("Access Token:", data.access);
+                } else {
+                    alert("Login Failed: " + (data.error || "Unknown Error"));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred during login.");
+            });
+        }
+    </script>
+
+</body>
+</html>
